@@ -139,7 +139,9 @@ class SimpsonsHaiku():
         return (count_list[-1]==17) and (5 in count_list) and (12 in count_list)
 
 
-    def generate_haiku(self, return_list=False, syllable_patterns=[[5,7,5]]):
+    def generate_haiku(self, 
+                       return_list=False, 
+                       syllable_patterns=[[5,7,5], [17], [5, 12], [12, 5]]):
         """Using an either an exisiting haiku DataFrame or generating one, sample 
         a haiku, parsed in the 5-7-5 line format. Either return as a list or as a
         string delimited with newline characters.
@@ -193,4 +195,3 @@ if __name__=='__main__':
     simpsons_haiku = SimpsonsHaiku('haiku_df.csv')
     haiku = simpsons_haiku.generate_haiku()
     print(haiku)
-    
