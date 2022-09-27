@@ -2,14 +2,16 @@ import re
 import json
 import syllapy
 import syllables
+import warnings
 import pandas as pd
 import numpy as np
-
 from tqdm import tqdm
 from nltk.corpus import cmudict
 
+warnings.simplefilter(action='ignore', category=(FutureWarning, pd.errors.DtypeWarning))
 
 class SimpsonsHaiku():
+
 
     def __init__(self, haiku_df=None):
         self.file_path = 'dataset/simpsons_script_lines.csv'
@@ -20,14 +22,15 @@ class SimpsonsHaiku():
         self.script = self.load_script()
         self.haiku_df = haiku_df
 
+
     def load_script(self, 
-                    error_bad_lines=False,
+                    on_bad_lines='skip',
                     speaking_only=True):
         """Load Simpsons script into pandas DataFrame."""
 
         tqdm.pandas()
-        script_lines = pd.read_csv(self.file_path, error_bad_lines=error_bad_lines,
-                                dtype={'speaking_lines' : bool})
+        script_lines = pd.read_csv(self.file_path, on_bad_lines=on_bad_lines,
+                                   dtype={'speaking_lines' : bool})
         
         # Data cleaning on speaking lines
         script_lines['speaking_line'] = script_lines['speaking_line'].replace({'true': True, 'false': False})
@@ -43,7 +46,7 @@ class SimpsonsHaiku():
 
         # Split longer lines of dialogue based on delimiters and explode to longer format
         script_lines['spoken_words_split'] = script_lines['spoken_words'].str.replace('?', '.').str.replace('!', '.').str.replace('/', '.').str.split('.')  # split on '.!?/', but could extend to ':;,'
-        # TODO Regex version instead? Keep (multiple) elimiters? Exclude Mr. etc.
+        # TODO Regex version instead? Keep (multiple) delimiters? Exclude Mr. etc.
         # script_lines['spoken_words_split'] = script_lines['spoken_words'].apply(lambda x: re.split('[?!/]', x))  # split on '.!?/', but could extend to ':;,'
 
         script_lines['number_in_line'] = script_lines['spoken_words_split'].apply(lambda x: [i for i in range(1, len(x)+1)])
@@ -54,10 +57,6 @@ class SimpsonsHaiku():
 
         script_lines['n_syllables'] = script_lines.spoken_words_split.progress_apply(self.count_syllables_line)
         script_lines = script_lines[script_lines.n_syllables > 0]
-
-        # non-explode version
-        # script_lines['spoken_words_split'] = script_lines['spoken_words']
-        # script_lines = script_lines.sort_values(['episode_id', 'number'])
 
         return script_lines
 
@@ -83,7 +82,7 @@ class SimpsonsHaiku():
         return max(1, n_syl)
 
 
-    def count_syllables_line(self, line, return_list=False): #, s_dict):
+    def count_syllables_line(self, line, return_list=False):
         """"Count number of syllables in a line. Return either the final count or a list of cumulative counts from 
         constituent words.
         """
@@ -140,19 +139,27 @@ class SimpsonsHaiku():
         return (count_list[-1]==17) and (5 in count_list) and (12 in count_list)
 
 
-    def generate_haiku(self, return_list=False):
+    def generate_haiku(self, return_list=False, syllable_patterns=[[5,7,5]]):
         """Using an either an exisiting haiku DataFrame or generating one, sample 
         a haiku, parsed in the 5-7-5 line format. Either return as a list or as a
         string delimited with newline characters.
         """
 
         if self.haiku_df:
-            haiku_df = self.haiku_df
+            if isinstance(self.haiku_df, str):
+                haiku_df = pd.read_csv(self.haiku_df, converters={'n_syllables': eval})
+            elif isinstance(self.haiku_df, pd.DataFrame):
+                haiku_df = self.haiku_df
+            else:
+                raise ValueError('`haiku_df` must be of type `str` or `DataFrame`')
         else:
             haiku_df = self.generate_haiku_df(save=True)
 
+        # Select for specific syllable pattern
+        haiku_df = haiku_df[haiku_df.n_syllables.apply(lambda x: x in syllable_patterns)]
+
         haiku = haiku_df.sample().spoken_words_split.values[0]
-        words = haiku[0].replace('-', ' ').replace('/', ' ').split(' ')
+        words = haiku.replace('-', ' ').replace('/', ' ').split(' ')
         
         count = 0
 
@@ -182,106 +189,8 @@ class SimpsonsHaiku():
             return '\n'.join(haiku_list)
 
 
-    # def generate_dictionary(self, script_lines, save=True):
-    #     """Generate dictionary of words from Simpsons corpus, together with syllable count."""
-
-    #     tqdm.pandas()
-    #     # String all dialogue into one line and split into list of strings
-    #     corpus = script_lines['spoken_words'].str.cat(sep=' ')
-    #     for char in self.strip_list:
-    #         corpus = corpus.replace(char, '')    
-    #     corpus_list = corpus.lower().replace('-', ' ').replace('/', ' ').split(' ')
-
-    #     corpus_df = pd.DataFrame({'word' : corpus_list})
-    #     simpsons_count = corpus_df.value_counts().reset_index(name='counts')
-
-    #     simpsons_dict = {}
-    #     for word in tqdm(simpsons_count['word']):
-            
-    #         for char in self.strip_list:
-    #             word = word.replace(char, '')
-    #         word = word.lower()
-
-    #         if word:
-    #             n_syllables = self.num_syllables(word)
-
-    #             if word not in simpsons_dict.keys():
-    #                 simpsons_dict[word] = n_syllables
-
-
-    #     self.simpsons_dict = simpsons_dict
-
-    #     if save:
-    #         pass  # Do a save of syllable dict to json
-
-    #     # return simpsons_dict
-
-
-    # def get_haiku_lines(self, save=False):
-    #     """Find lines of dialogue that are already self-contained haikus."""
-        
-    #     script_lines=self.script
-
-    #     tqdm.pandas()
-    #     script_lines['syllables'] = script_lines['normalized_text'].progress_apply(self.count_syllables_line)
-        
-    #     ready_haikus = script_lines[script_lines['syllables'] == 17]
-
-    #     if save:
-    #         ready_haikus.to_csv('readymade_haikus.csv')
-
-    #     return ready_haikus
-
-
-    # def generate_haiku(script_lines):
-    #     """Identify existing haikus from script, starting at random point in corpus.
-    #     """
-
-    #     line_1, line_2, line_3 = "", "", ""
-    #     syllable_count = 0
-        
-    #     # String all dialogue into one line
-    #     generate_dictionary(script_lines)
-    #     corpus = script_lines['normalized_text'].str.cat(sep=' ')
-    #     corpus_list = corpus.split(' ')
-
-    #     # Select index of starting word at random
-    #     random_int = np.random.randint(len(corpus_list))
-    #     random_element = corpus_list[random_int] + ' '
-    #     line_1 += random_element
-    #     syllable_count += syllables.estimate(random_element)
-
-    #     for i in range(random_int + 1, random_int + 17):
-
-    #         element = corpus_list[i] + ' '
-    #         element_syllables = syllables.estimate(element)
-
-    #         if syllable_count + element_syllables <= 5:
-    #             line_1 += element
-    #             # syllable_count += syllables.estimate(element)
-
-    #         elif syllable_count + element_syllables <= 12:
-    #             line_2 += element
-    #             # syllable_count += syllables.estimate(element)
-
-    #         elif syllable_count + element_syllables <= 17:
-    #             line_3 += element
-
-    #         else:
-    #             break
-                
-    #         syllable_count += element_syllables
-
-    #     print(line_1)
-    #     print(line_2)
-    #     print(line_3)
-    #     print(syllable_count)
-
-
 if __name__=='__main__':
-    # print(count_syllables_line('leased your camry from christian brothers auto'))
-    # script = load_script()
-    # generate_haiku(script)
-    # print(count_syllables_line("you're"))
-    # print(count_syllables_line("moe youre always moe homer look your house is on tv you"))
-    pass
+    simpsons_haiku = SimpsonsHaiku('haiku_df.csv')
+    haiku = simpsons_haiku.generate_haiku()
+    print(haiku)
+    
