@@ -25,7 +25,8 @@ class SimpsonsHaiku():
 
     def load_script(self, 
                     on_bad_lines='skip',
-                    speaking_only=True):
+                    speaking_only=True,
+                    golden_age=False):
         """Load Simpsons script into pandas DataFrame."""
 
         tqdm.pandas()
@@ -44,10 +45,25 @@ class SimpsonsHaiku():
         script_lines['raw_character_text'] = script_lines['raw_character_text'].fillna('Missing Character')
         script_lines['raw_location_text'] = script_lines['raw_location_text'].fillna('Missing Location')
 
+        # Join in episode/season information
+        episode_data = pd.read_csv('dataset/simpsons_episodes.csv')[['id', 'title', 'season', 'number_in_series']]
+        script_lines = pd.merge(script_lines, episode_data, how='left', left_on='episode_id', right_on='id')
+
+        if golden_age:
+            script_lines = script_lines[script_lines.season <= 9]
+
         # Split longer lines of dialogue based on delimiters and explode to longer format
-        script_lines['spoken_words_split'] = script_lines['spoken_words'].str.replace('?', '.').str.replace('!', '.').str.replace('/', '.').str.split('.')  # split on '.!?/', but could extend to ':;,'
-        # TODO Regex version instead? Keep (multiple) delimiters? Exclude Mr. etc.
-        # script_lines['spoken_words_split'] = script_lines['spoken_words'].apply(lambda x: re.split('[?!/]', x))  # split on '.!?/', but could extend to ':;,'
+        replace_list = ['!', '?', '/', ':', ';']   
+        salutation_list = ['Dr.', 'Mr.', 'Mrs.', 'Ms.']  # TODO do extensive search on words with periods, including salutations and abbreviations (NFL, DVD, FBI, etc)
+        abbrev_list = ['K.F.C.']
+
+        script_lines['spoken_words_split'] = script_lines['spoken_words']
+        for char in replace_list:
+            script_lines['spoken_words_split'] = script_lines['spoken_words_split'].str.replace(char,  '.', regex=False)
+        for salutation in salutation_list + abbrev_list:
+            script_lines['spoken_words_split'] = script_lines['spoken_words_split'].str.replace(salutation, salutation.replace('.', ''), regex=False)
+        
+        script_lines['spoken_words_split'] = script_lines['spoken_words_split'].str.split('.')
 
         script_lines['number_in_line'] = script_lines['spoken_words_split'].apply(lambda x: [i for i in range(1, len(x)+1)])
         script_lines = script_lines.explode(['spoken_words_split', 'number_in_line'])
@@ -57,6 +73,7 @@ class SimpsonsHaiku():
 
         script_lines['n_syllables'] = script_lines.spoken_words_split.progress_apply(self.count_syllables_line)
         script_lines = script_lines[script_lines.n_syllables > 0]
+        
 
         return script_lines
 
@@ -64,6 +81,8 @@ class SimpsonsHaiku():
     def num_syllables(self, word):
         """Number of syllables using NLTK. Props to user hoju (!) at `https://stackoverflow.com/a/4103234`."""
         
+        # TODO Add step to cast numeric characters as to words
+
         for char in self.strip_list:
             word = word.replace(char, '')
         word = word.lower()
@@ -124,6 +143,10 @@ class SimpsonsHaiku():
         # Check for parsability, requiring no word-breaks to confirm to 5-7-5 structure
         haiku_df = haiku_df[haiku_df.spoken_words_split.progress_apply(self.is_parsable_as_haiku)]
         
+        # Un-aggregate features that are the same for all lines of the haiku
+        for feature in ['season']:
+            haiku_df[feature] = haiku_df[feature].str[0]
+
         self.haiku_df = haiku_df
 
         if save:
@@ -160,7 +183,8 @@ class SimpsonsHaiku():
         # Select for specific syllable pattern
         haiku_df = haiku_df[haiku_df.n_syllables.apply(lambda x: x in syllable_patterns)]
 
-        haiku = haiku_df.sample().spoken_words_split.values[0]
+        haiku_row = haiku_df.sample()
+        haiku = haiku_row.spoken_words_split.values[0]
         words = haiku.replace('-', ' ').replace('/', ' ').split(' ')
         
         count = 0
@@ -186,9 +210,9 @@ class SimpsonsHaiku():
         haiku_list = [line.strip() for line in haiku_list]
 
         if return_list:    
-            return haiku_list
+            return haiku_list, haiku_row
         else:
-            return '\n'.join(haiku_list)
+            return '\n'.join(haiku_list), haiku_row
 
 
 if __name__=='__main__':
