@@ -27,7 +27,26 @@ class SimpsonsHaiku():
                     on_bad_lines='skip',
                     speaking_only=True,
                     golden_age=False):
-        """Load Simpsons script into pandas DataFrame."""
+        """Core data loading and wrangling function, loading Simpsons script 
+        into a pandas DataFrame, cleaning entries, joining episode metadata,
+        splitting lines of dialogue based on delimiters and then expanding the 
+        dataframe to one row per dialogue-chunk
+
+        Parameters
+        ----------
+        on_bad_lines:
+
+        speaking_only:
+
+        golden_age: boolean
+            Whether or not to filter to season 9 or earlier, to guarantee only
+            golden-age haikus.
+
+        Returns
+        -------
+        script_lines : pandas DataFrame
+            DataFrame with one row per  
+        """
 
         tqdm.pandas()
         script_lines = pd.read_csv(self.file_path, on_bad_lines=on_bad_lines,
@@ -55,7 +74,7 @@ class SimpsonsHaiku():
         # Split longer lines of dialogue based on delimiters and explode to longer format
         replace_list = ['!', '?', '/', ':', ';']   
         salutation_list = ['Dr.', 'Mr.', 'Mrs.', 'Ms.']  # TODO do extensive search on words with periods, including salutations and abbreviations (NFL, DVD, FBI, etc)
-        abbrev_list = ['K.F.C.']
+        abbrev_list = ['K.F.C.', 'M.H.D.', 'T.V.', 'D.V.D.']
 
         script_lines['spoken_words_split'] = script_lines['spoken_words']
         for char in replace_list:
@@ -74,7 +93,6 @@ class SimpsonsHaiku():
         script_lines['n_syllables'] = script_lines.spoken_words_split.progress_apply(self.count_syllables_line)
         script_lines = script_lines[script_lines.n_syllables > 0]
         
-
         return script_lines
 
 
@@ -168,13 +186,32 @@ class SimpsonsHaiku():
         """Using an either an exisiting haiku DataFrame or generating one, sample 
         a haiku, parsed in the 5-7-5 line format. Either return as a list or as a
         string delimited with newline characters.
+        
+        Parameters
+        ----------
+        return_list: boolean
+            Whether or not to return haiku as a list.
+        syllable_patterns : List[Lists]
+            List of lists, where each list is a combination of syllable counts
+            from constituent dialogue fragments, each adding up to 17. This will
+            sample only from haikus that have one of the constituent syllable 
+            patterns.
+
+        Returns
+        -------
+        '\n'.join(haiku_list), haiku_row : Tuple[str, DataFrame] or
+        haiku_list, haiku_row : Tuple[List, DataFrame]
+            Tuple of haiku (either in string or list format) and metadata from
+            corresponding row in DataFrame. 
         """
 
-        if self.haiku_df:
-            if isinstance(self.haiku_df, str):
-                haiku_df = pd.read_csv(self.haiku_df, converters={'n_syllables': eval})
-            elif isinstance(self.haiku_df, pd.DataFrame):
-                haiku_df = self.haiku_df
+        haiku_df = self.haiku_df
+
+        if haiku_df is not None:
+            if isinstance(haiku_df, str):
+                haiku_df = pd.read_csv(haiku_df, converters={'n_syllables': eval})
+            elif isinstance(haiku_df, pd.DataFrame):
+                pass
             else:
                 raise ValueError('`haiku_df` must be of type `str` or `DataFrame`')
         else:
