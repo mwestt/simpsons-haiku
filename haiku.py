@@ -25,22 +25,17 @@ class SimpsonsHaiku():
 
     def load_script(self, 
                     on_bad_lines='skip',
-                    speaking_only=True,
-                    golden_age=False):
+                    speaking_only=True):
         """Core data loading and wrangling function, loading Simpsons script 
         into a pandas DataFrame, cleaning entries, joining episode metadata,
         splitting lines of dialogue based on delimiters and then expanding the 
-        dataframe to one row per dialogue-chunk
+        dataframe to one row per dialogue chunk.
 
         Parameters
         ----------
-        on_bad_lines:
+        on_bad_lines :
 
-        speaking_only:
-
-        golden_age: boolean
-            Whether or not to filter to season 9 or earlier, to guarantee only
-            golden-age haikus.
+        speaking_only :
 
         Returns
         -------
@@ -65,16 +60,14 @@ class SimpsonsHaiku():
         script_lines['raw_location_text'] = script_lines['raw_location_text'].fillna('Missing Location')
 
         # Join in episode/season information
-        episode_data = pd.read_csv('dataset/simpsons_episodes.csv')[['id', 'title', 'season', 'number_in_series']]
+        episode_data = pd.read_csv('dataset/simpsons_episodes.csv')[['id', 'title', 'season', 'number_in_season']]
         script_lines = pd.merge(script_lines, episode_data, how='left', left_on='episode_id', right_on='id')
-
-        if golden_age:
-            script_lines = script_lines[script_lines.season <= 9]
 
         # Split longer lines of dialogue based on delimiters and explode to longer format
         replace_list = ['!', '?', '/', ':', ';']   
         salutation_list = ['Dr.', 'Mr.', 'Mrs.', 'Ms.']  # TODO do extensive search on words with periods, including salutations and abbreviations (NFL, DVD, FBI, etc)
-        abbrev_list = ['K.F.C.', 'M.H.D.', 'T.V.', 'D.V.D.']
+        abbrev_list = ['K.F.C.', 'M.H.D.', 'T.V.', 'D.V.D.', '4.0', 'N.R.A.', 'C.S.I', 'D.W.', 'P.G.', 'F.B.I', 'F.D.R.',
+                       'F.D.A.', 'A.B.C.', 'B.Y.O.B.', 'T.C.B.Y', 'B.B.C', 'U.F.O.', ]
 
         script_lines['spoken_words_split'] = script_lines['spoken_words']
         for char in replace_list:
@@ -120,8 +113,8 @@ class SimpsonsHaiku():
 
 
     def count_syllables_line(self, line, return_list=False):
-        """"Count number of syllables in a line. Return either the final count or a list of cumulative counts from 
-        constituent words.
+        """"Count number of syllables in a line. Return either the final count 
+        or a list of cumulative counts from constituent words.
         """
 
         words = line.lower().replace('-', ' ').replace('/', ' ').split(' ')
@@ -162,7 +155,8 @@ class SimpsonsHaiku():
         haiku_df = haiku_df[haiku_df.spoken_words_split.progress_apply(self.is_parsable_as_haiku)]
         
         # Un-aggregate features that are the same for all lines of the haiku
-        for feature in ['season']:
+        for feature in ['season', 'title', 'number_in_season']:
+            assert all(haiku_df[feature].apply(lambda x: len(set(x)) == 1))
             haiku_df[feature] = haiku_df[feature].str[0]
 
         self.haiku_df = haiku_df
@@ -182,7 +176,8 @@ class SimpsonsHaiku():
 
     def generate_haiku(self, 
                        return_list=False, 
-                       syllable_patterns=[[5,7,5], [17], [5, 12], [12, 5]]):
+                       syllable_patterns=[[5, 7, 5], [17], [5, 12], [12, 5]],
+                       golden_age=False):
         """Using an either an exisiting haiku DataFrame or generating one, sample 
         a haiku, parsed in the 5-7-5 line format. Either return as a list or as a
         string delimited with newline characters.
@@ -196,10 +191,14 @@ class SimpsonsHaiku():
             from constituent dialogue fragments, each adding up to 17. This will
             sample only from haikus that have one of the constituent syllable 
             patterns.
+        golden_age : boolean
+            Whether or not to filter to season 9 or earlier, to guarantee only
+            golden-age haikus.
 
         Returns
         -------
-        '\n'.join(haiku_list), haiku_row : Tuple[str, DataFrame] or
+        '\n'.join(haiku_list), haiku_row : Tuple[str, DataFrame]
+        or
         haiku_list, haiku_row : Tuple[List, DataFrame]
             Tuple of haiku (either in string or list format) and metadata from
             corresponding row in DataFrame. 
@@ -216,9 +215,13 @@ class SimpsonsHaiku():
                 raise ValueError('`haiku_df` must be of type `str` or `DataFrame`')
         else:
             haiku_df = self.generate_haiku_df(save=True)
+        
+        if golden_age:
+            haiku_df = haiku_df[haiku_df.season <= 9]
 
         # Select for specific syllable pattern
-        haiku_df = haiku_df[haiku_df.n_syllables.apply(lambda x: x in syllable_patterns)]
+        if syllable_patterns is not None:
+            haiku_df = haiku_df[haiku_df.n_syllables.apply(lambda x: x in syllable_patterns)]
 
         haiku_row = haiku_df.sample()
         haiku = haiku_row.spoken_words_split.values[0]
@@ -244,7 +247,8 @@ class SimpsonsHaiku():
             
             haiku_list[i] += word + ' '
         
-        haiku_list = [line.strip() for line in haiku_list]
+        # haiku_list = [line.strip() for line in haiku_list]
+        haiku_list = [re.sub(' +', ' ', line).strip() for line in haiku_list]
 
         if return_list:    
             return haiku_list, haiku_row
