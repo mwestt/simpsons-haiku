@@ -19,8 +19,9 @@ class SimpsonsHaiku():
         self.nltk_dict = cmudict.dict()
         self.syllapy_dict = syllapy.WORD_DICT
         self.simpson_dict = json.load(open('simpson_lect.json'))
-        self.script = self.load_script()
         self.haiku_df = haiku_df
+        if haiku_df is None:
+            self.script = self.load_script()
 
 
     def load_script(self, 
@@ -101,9 +102,9 @@ class SimpsonsHaiku():
         if word in self.simpson_dict:
             n_syl = self.simpson_dict[word]
         elif word in self.nltk_dict.keys():
-            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word]][0]
+            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word]][-1]
         elif word[-1] == 's' and word[:-1] in self.nltk_dict.keys():
-            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word[:-1]]][0]
+            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word[:-1]]][-1]
         elif word in self.syllapy_dict:
             n_syl = self.syllapy_dict[word]
         else:  # Resort to estimation

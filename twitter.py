@@ -1,9 +1,9 @@
 import json
-from stringprep import in_table_a1
 import tweepy
 import compuglobal
 import requests
-import pandas as pd
+import numpy as np
+from datetime import datetime
 
 from haiku import SimpsonsHaiku
 
@@ -30,10 +30,11 @@ class SimpsonsTwitterBot():
         return api
 
 
-    def tweet_haiku(self, media_reply=True, media_type='jpg', add_metadata=True):
+    def tweet_haiku(self, media_reply=True, media_type='jpg', add_metadata=True,
+                    caption=False, golden_age=False):
         """Load SimpsonsHaiku object and sample and tweet a haiku."""
         simpsons_haiku = SimpsonsHaiku(self.haiku_df)
-        haiku, metadata = simpsons_haiku.generate_haiku()
+        haiku, metadata = simpsons_haiku.generate_haiku(golden_age=golden_age)
 
         tweet = self.api.update_status(haiku)
         tweet_id = tweet._json['id']
@@ -49,20 +50,32 @@ class SimpsonsTwitterBot():
             else:
                 q = ''
 
-            image_url, gif_url, mp4_url = self.search_frinkiac(haiku, episode_key)
+            # First try
+            image_url, meme_url, gif_url, mp4_url = self.search_frinkiac(haiku, episode_key)
+            # Second try
+            if image_url is None and meme_url is None and gif_url is None and mp4_url is None:
+                haiku_end = '\n'.join(haiku.split('\n')[1:])
+                image_url, meme_url, gif_url, mp4_url = self.search_frinkiac(haiku_end, episode_key)
+            # Third try
+            if image_url is None and meme_url is None and gif_url is None and mp4_url is None:
+                haiku_start = '\n'.join(haiku.split('\n')[:2])
+                image_url, meme_url, gif_url, mp4_url = self.search_frinkiac(haiku_start, episode_key)
 
-            if image_url is None and gif_url is None and mp4_url is None:
+            if image_url is None and meme_url is None and gif_url is None and mp4_url is None:
                 self.api.update_status(q, in_reply_to_status_id=tweet_id)
                 return "No Frinkiac result found."
 
             if media_type == 'jpg':
-                media = requests.get(image_url).content
+                if caption:
+                    media = requests.get(meme_url).content
+                else:
+                    media = requests.get(image_url).content
             elif media_type == 'gif':
                 media = requests.get(gif_url).content
             elif media_type == 'mp4':
                 media = requests.get(mp4_url).content
 
-            media_filename = 'media.{}'.format(media_type)
+            media_filename = 'media/media.{}'.format(media_type)
             with open(media_filename, 'wb') as handler:
                 handler.write(media)
 
@@ -71,23 +84,28 @@ class SimpsonsTwitterBot():
 
 
     def search_frinkiac(self, query, episode_key):
-        """Search Frinkiac using the haiku and return URL to image and gif."""
+        """Search Frinkiac using the haiku and return URL to image, gif, and mp4."""
 
         simpsons = compuglobal.Frinkiac()
         query = query.replace('\n', ' ')
 
-        gif_url, image_url, mp4_url = None, None, None
+        # Caption encoding
+        # caption = simpsons.encode_caption(query)
+        caption = simpsons.format_caption(query, max_lines=3)
+
+        image_url, meme_url, gif_url, mp4_url = None, None, None, None
         search_results = simpsons.search(query)
         for result in search_results:
             if result.key == episode_key:
                 screencap = simpsons.get_screencap(result.key, 
                                                    result.timestamp)
                 image_url = screencap.get_image_url()
+                meme_url = screencap.get_meme_url(caption)
                 gif_url = screencap.get_gif_url()
                 mp4_url = screencap.get_mp4_url()
                 break
         
-        return image_url, gif_url, mp4_url
+        return image_url, meme_url, gif_url, mp4_url
 
 
 if __name__ == '__main__':
@@ -97,7 +115,13 @@ if __name__ == '__main__':
         haiku_df='haiku_df.csv'
     )
 
-    print(simpsons_bot.tweet_haiku(media_reply=True, media_type='jpg', add_metadata=True))
-    
-    # for tweet in simpsons_bot.api.home_timeline():
-    #     print(tweet._json['text'])
+
+    # media_type = np.random.choice(['jpg', 'gif'])
+
+    # "Golden-age Tuesdays"
+    day = datetime.today().weekday()
+    golden_age = True if day == 1 else False
+
+    # Tweet on, son, tweet on!
+    print(simpsons_bot.tweet_haiku(media_reply=True, media_type='jpg', 
+                                   add_metadata=True, golden_age=golden_age))
