@@ -115,8 +115,8 @@ if __name__ == '__main__':
         haiku_df='haiku_df.csv'
     )
 
-
-    # media_type = np.random.choice(['jpg', 'gif'])
+    # Select 
+    media_type = np.random.choice(['jpg', 'gif'])
 
     # "Golden-age Tuesdays"
     day = datetime.today().weekday()

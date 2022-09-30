@@ -138,7 +138,7 @@ class SimpsonsHaiku():
             return count
 
 
-    def generate_haiku_df(self, save=False):
+    def generate_haiku_df(self, save=True):
         """Generate DataFrame of haikus from corpus."""
         
         haiku_list = []
@@ -259,5 +259,5 @@ class SimpsonsHaiku():
 
 if __name__=='__main__':
     simpsons_haiku = SimpsonsHaiku('haiku_df.csv')
-    haiku = simpsons_haiku.generate_haiku()
+    haiku, metadata = simpsons_haiku.generate_haiku()
     print(haiku)
