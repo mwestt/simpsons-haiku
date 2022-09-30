@@ -34,3 +34,8 @@ def main():
     # Tweet on, son, tweet on!
     print(simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
                                    add_metadata=True, golden_age=golden_age))
+
+
+
+if __name__ == "__main__":
+    main()
