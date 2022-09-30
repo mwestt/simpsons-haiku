@@ -1,6 +1,3 @@
-
-<!-- ![](media/47_ronin.png "I wanted to be Oshi, but they made me Ori") -->
-
 <img src="media/47_ronin.png" title="I wanted to be Oshi, but they made me Ori" style="width:100%;">
 
 # Simpsons Haiku Bot
