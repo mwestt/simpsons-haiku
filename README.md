@@ -27,9 +27,14 @@ We start by instantiating the core haiku object, of class `SimpsonsHaiku` from `
 ```python
 from haiku import SimpsonsHaiku
 
-simpsons_haiku = SimpsonsHaiku()
+simpsons_haiku = SimpsonsHaiku()  # Saves haiku DataFrame to `haiku_df.csv`
 simpsons_haiku.generate_haiku_df()
 
+haiku, metadata = simpsons_haiku.generate_haiku()
+```
+Or you can pass in the path to a `haiku_df` or the DataFrame itself, and avoid waiting for the data wrangling, for example:
+```python
+simpsons_haiku = SimpsonsHaiku('haiku_df.csv')  # Faster, no data wrangling
 haiku, metadata = simpsons_haiku.generate_haiku()
 ```
 ```python
