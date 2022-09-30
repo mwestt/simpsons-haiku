@@ -32,9 +32,11 @@ simpsons_haiku.generate_haiku_df()
 
 haiku, metadata = simpsons_haiku.generate_haiku()
 ```
-```
+```python
 >>> print(haiku)
-Shredded newspapers
-add much needed roughage
-and essential inks
+```
+```
+It doesn't take a
+whiz to see that you're looking
+out for number one
 ```
