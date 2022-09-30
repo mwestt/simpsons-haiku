@@ -1,6 +1,3 @@
-
-<!-- ![](media/47_ronin.png "I wanted to be Oshi, but they made me Ori") -->
-
 <img src="media/47_ronin.png" title="I wanted to be Oshi, but they made me Ori" style="width:100%;">
 
 # Simpsons Haiku Bot
@@ -30,16 +27,21 @@ We start by instantiating the core haiku object, of class `SimpsonsHaiku` from `
 ```python
 from haiku import SimpsonsHaiku
 
-simpsons_haiku = SimpsonsHaiku()
+simpsons_haiku = SimpsonsHaiku()  # Saves haiku DataFrame to `haiku_df.csv` by default
 simpsons_haiku.generate_haiku_df()
 
+haiku, metadata = simpsons_haiku.generate_haiku()
+```
+Or you can pass in the path to a `haiku_df` or the DataFrame itself, and avoid waiting for the data wrangling, for example:
+```python
+simpsons_haiku = SimpsonsHaiku('haiku_df.csv')  # Faster, no data wrangling
 haiku, metadata = simpsons_haiku.generate_haiku()
 ```
 ```python
 >>> print(haiku)
 ```
 ```
-Shredded newspapers
-add much needed roughage
-and essential inks
+It doesn't take a
+whiz to see that you're looking
+out for number one
 ```
