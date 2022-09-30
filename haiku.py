@@ -68,8 +68,12 @@ class SimpsonsHaiku():
         replace_list = ['!', '?', '/', ':', ';']   
         salutation_list = ['Dr.', 'Mr.', 'Mrs.', 'Ms.']  # TODO do extensive search on words with periods, 
                                                          # including salutations and abbreviations (NFL, DVD, FBI, etc)
-        abbrev_list = ['K.F.C.', 'M.H.D.', 'T.V.', 'D.V.D.', '4.0', 'N.R.A.', 'C.S.I', 'D.W.', 'P.G.', 'F.B.I', 'F.D.R.',
-                       'F.D.A.', 'A.B.C.', 'B.Y.O.B.', 'T.C.B.Y', 'B.B.C', 'U.F.O.', ]
+        abbrev_list = ['K.F.C.', 'M.H.D.', 'T.V.', 'D.V.D.', '4.0', 'N.R.A.', 'C.S.I.', 'D.W.', 'P.G.', 'F.B.I.', 'F.D.R.',
+                       'F.D.A.', 'A.B.C.', 'B.Y.O.B.', 'T.C.B.Y.', 'B.B.C.', 'U.F.O.', 'C.D.', 'C.M.', 'C.E.O.', 'O.C.D.',
+                       'A. C.', 'A.C.', 'P.C.', 'C.P.R.', 'N.C.', 'L.P.', 'U.C.A.A.', 'S.B.C.', 'B.P.', 'U.P.K.C.C.', 'S.E.C.',
+                       'R.O.T.C.', 'D.C.', 'C.J.', 'O.C.', 'M.C.', 'B.O.C.', 'C.O.D.', 'B.C.', 'C. M', 'U.S.A.', 'S.A.T.',
+                       'A.D.D.', 'P.E.T.A.', 'A.M.', 'D.N.A.', 'A.A.', 'I.D.', 'P.T.A.', 'X.Y.Z.', 'X.R.L.', 'G.I', 'G.P.S.',
+                       'G.O.P.', 'D.M.V.', 'A.D.', 'D.U.I.', '']
 
         script_lines['spoken_words_split'] = script_lines['spoken_words']
         for char in replace_list:

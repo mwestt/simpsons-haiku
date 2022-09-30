@@ -1,3 +1,4 @@
+import os
 import json
 import tweepy
 import compuglobal
@@ -109,8 +110,20 @@ class SimpsonsTwitterBot():
 
 if __name__ == '__main__':
 
+    try:
+        # Local version
+        auth_dict=json.load(open('auth.json'))
+    except:
+        # GCP version
+        auth_dict = {
+            'api_key': os.environ.get("CONSUMER_KEY"),
+            'api_key_secret': os.environ.get("CONSUMER_SECRET"),
+            'access_token': os.environ.get("ACCESS_TOKEN"),
+            'access_token_secret': os.environ.get("ACCESS_TOKEN_SECRET")
+        }
+
     simpsons_bot = SimpsonsTwitterBot(
-        auth_dict=json.load(open('auth.json')), 
+        auth_dict=auth_dict,
         haiku_df='haiku_df.csv'
     )
 
