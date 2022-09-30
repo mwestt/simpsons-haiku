@@ -66,7 +66,8 @@ class SimpsonsHaiku():
 
         # Split longer lines of dialogue based on delimiters and explode to longer format
         replace_list = ['!', '?', '/', ':', ';']   
-        salutation_list = ['Dr.', 'Mr.', 'Mrs.', 'Ms.']  # TODO do extensive search on words with periods, including salutations and abbreviations (NFL, DVD, FBI, etc)
+        salutation_list = ['Dr.', 'Mr.', 'Mrs.', 'Ms.']  # TODO do extensive search on words with periods, 
+                                                         # including salutations and abbreviations (NFL, DVD, FBI, etc)
         abbrev_list = ['K.F.C.', 'M.H.D.', 'T.V.', 'D.V.D.', '4.0', 'N.R.A.', 'C.S.I', 'D.W.', 'P.G.', 'F.B.I', 'F.D.R.',
                        'F.D.A.', 'A.B.C.', 'B.Y.O.B.', 'T.C.B.Y', 'B.B.C', 'U.F.O.', ]
 
@@ -102,15 +103,15 @@ class SimpsonsHaiku():
         if word in self.simpson_dict:
             n_syl = self.simpson_dict[word]
         elif word in self.nltk_dict.keys():
-            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word]][-1]
+            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word]][0]
         elif word[-1] == 's' and word[:-1] in self.nltk_dict.keys():
-            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word[:-1]]][-1]
+            n_syl = [len(list(y for y in x if y[-1].isdigit())) for x in self.nltk_dict[word[:-1]]][0]
         elif word in self.syllapy_dict:
             n_syl = self.syllapy_dict[word]
         else:  # Resort to estimation
             n_syl = syllables.estimate(word)
 
-        return max(1, n_syl)
+        return n_syl
 
 
     def count_syllables_line(self, line, return_list=False):

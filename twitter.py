@@ -89,8 +89,7 @@ class SimpsonsTwitterBot():
         simpsons = compuglobal.Frinkiac()
         query = query.replace('\n', ' ')
 
-        # Caption encoding
-        # caption = simpsons.encode_caption(query)
+        # Caption formatting
         caption = simpsons.format_caption(query, max_lines=3)
 
         image_url, meme_url, gif_url, mp4_url = None, None, None, None
@@ -115,13 +114,13 @@ if __name__ == '__main__':
         haiku_df='haiku_df.csv'
     )
 
-    # Select 
+    # Select media type at random
     media_type = np.random.choice(['jpg', 'gif'])
 
-    # "Golden-age Tuesdays"
+    # "Golden-age Wednesdays"
     day = datetime.today().weekday()
-    golden_age = True if day == 1 else False
+    golden_age = True if day == 2 else False
 
     # Tweet on, son, tweet on!
-    print(simpsons_bot.tweet_haiku(media_reply=True, media_type='jpg', 
+    print(simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
                                    add_metadata=True, golden_age=golden_age))
