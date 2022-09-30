@@ -19,7 +19,7 @@ To run the project and generate your own haikus, you'll need to clone the reposi
 
 ```
 git clone https://github.com/mwestt/simpsons-haiku.git
-conda env create -f environment.yml
+conda env create -f environment.yaml
 conda activate simpsons_haiku
 ```
 
