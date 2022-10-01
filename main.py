@@ -9,7 +9,7 @@ import numpy as np
 # from haiku import SimpsonsHaiku
 
 
-def main():
+def main(request):
     print('Starting point')
     # try:
     #     # Local version
