@@ -6,12 +6,11 @@ import requests
 import numpy as np
 from datetime import datetime
 
-# from haiku import SimpsonsHaiku
+from haiku import SimpsonsHaiku
 
 
 def main(request):
-    print('Starting point')
-    return 'Loop complete'
+    
     # try:
     #     # Local version
     #     auth_dict=json.load(open('auth.json'))
@@ -29,16 +28,19 @@ def main(request):
     #     haiku_df='haiku_df.csv'
     # )
 
-    # # Select media type at random
-    # media_type = np.random.choice(['jpg', 'gif'])
+    # Select media type at random
+    media_type = np.random.choice(['jpg', 'gif'])
 
-    # # "Golden-age Wednesdays"
-    # day = datetime.today().weekday()
-    # golden_age = True if day == 2 else False
+    # "Golden-age Wednesdays"
+    day = datetime.today().weekday()
+    golden_age = True if day == 2 else False
 
     # # Tweet on, son, tweet on!
     # simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
     #                          add_metadata=True, golden_age=golden_age)
+
+
+    return 'Loop complete'
 
 
 if __name__ == '__main__':
