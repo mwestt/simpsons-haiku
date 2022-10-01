@@ -1,16 +1,17 @@
-# import os
-# import json
-# import tweepy
-# import compuglobal
-# import requests
+import os
+import json
+import tweepy
+import compuglobal
+import requests
 import numpy as np
-# from datetime import datetime
+from datetime import datetime
 
 # from haiku import SimpsonsHaiku
 
 
 def main(request):
     print('Starting point')
+    return 'Loop complete'
     # try:
     #     # Local version
     #     auth_dict=json.load(open('auth.json'))
