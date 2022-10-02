@@ -1,32 +1,31 @@
 import os
 import json
-import tweepy
-import compuglobal
-import requests
+import logging
 import numpy as np
 from datetime import datetime
 
-from haiku import SimpsonsHaiku
+from twitter import SimpsonsTwitterBot
 
 
 def main(request):
     
-    # try:
-    #     # Local version
-    #     auth_dict=json.load(open('auth.json'))
-    # except:
-    #     # GCP version
-    #     auth_dict = {
-    #         'api_key': os.environ.get("CONSUMER_KEY"),
-    #         'api_key_secret': os.environ.get("CONSUMER_SECRET"),
-    #         'access_token': os.environ.get("ACCESS_TOKEN"),
-    #         'access_token_secret': os.environ.get("ACCESS_TOKEN_SECRET")
-    #     }
+    try:
+        # Local version
+        auth_dict=json.load(open('auth.json'))
+    except:
+        logging.info('Trying to access environment variables')
+        # GCP version
+        auth_dict = {
+            'api_key': os.environ.get("CONSUMER_KEY"),
+            'api_key_secret': os.environ.get("CONSUMER_SECRET"),
+            'access_token': os.environ.get("ACCESS_TOKEN"),
+            'access_token_secret': os.environ.get("ACCESS_TOKEN_SECRET")
+        }
 
-    # simpsons_bot = SimpsonsTwitterBot(
-    #     auth_dict=auth_dict,
-    #     haiku_df='haiku_df.csv'
-    # )
+    simpsons_bot = SimpsonsTwitterBot(
+        auth_dict=auth_dict,
+        haiku_df='haiku_df.csv'
+    )
 
     # Select media type at random
     media_type = np.random.choice(['jpg', 'gif'])
@@ -35,9 +34,9 @@ def main(request):
     day = datetime.today().weekday()
     golden_age = True if day == 2 else False
 
-    # # Tweet on, son, tweet on!
-    # simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
-    #                          add_metadata=True, golden_age=golden_age)
+    # Tweet on, son, tweet on!
+    simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
+                             add_metadata=True, golden_age=golden_age)
 
 
     return 'Loop complete'

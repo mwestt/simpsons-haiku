@@ -20,6 +20,7 @@ class SimpsonsHaiku():
         self.syllapy_dict = syllapy.WORD_DICT
         self.simpson_dict = json.load(open('simpson_lect.json'))
         self.haiku_df = haiku_df
+        self.base_script = None
         if haiku_df is None:
             self.script = self.load_script()
 
@@ -63,6 +64,7 @@ class SimpsonsHaiku():
         # Join in episode/season information
         episode_data = pd.read_csv('dataset/simpsons_episodes.csv')[['id', 'title', 'season', 'number_in_season']]
         script_lines = pd.merge(script_lines, episode_data, how='left', left_on='episode_id', right_on='id')
+        self.base_script = script_lines
 
         # Split longer lines of dialogue based on delimiters and explode to longer format
         replace_list = ['!', '?', '/', ':', ';']   

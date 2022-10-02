@@ -39,6 +39,7 @@ class SimpsonsTwitterBot():
 
         tweet = self.api.update_status(haiku)
         tweet_id = tweet._json['id']
+        print('Haiku tweeted')
         
         if media_reply:
             
@@ -82,6 +83,7 @@ class SimpsonsTwitterBot():
 
             media_id = self.api.media_upload(media_filename).media_id
             self.api.update_status(q, media_ids=[media_id], in_reply_to_status_id=tweet_id)
+            print('Media reply tweeted')
 
 
     def search_frinkiac(self, query, episode_key):
@@ -135,5 +137,5 @@ if __name__ == '__main__':
     golden_age = True if day == 2 else False
 
     # Tweet on, son, tweet on!
-    print(simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
-                                   add_metadata=True, golden_age=golden_age))
+    simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
+                             add_metadata=True, golden_age=golden_age)
