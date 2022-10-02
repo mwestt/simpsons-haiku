@@ -221,6 +221,7 @@ class SimpsonsHaiku():
                 pass
             else:
                 raise ValueError('`haiku_df` must be of type `str` or `DataFrame`')
+            self.haiku_df = haiku_df
         else:
             haiku_df = self.generate_haiku_df(save=True)
         
