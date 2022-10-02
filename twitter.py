@@ -11,7 +11,7 @@ from haiku import SimpsonsHaiku
 class SimpsonsTwitterBot():
 
 
-    def __init__(self, auth_dict=json.load(open('auth.json')), haiku_df=None):
+    def __init__(self, auth_dict=None, haiku_df=None):
         self.auth_dict = auth_dict
         self.API_KEY = self.auth_dict['api_key']
         self.API_SECRET = self.auth_dict['api_key_secret']
