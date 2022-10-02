@@ -40,7 +40,7 @@ def main(request):
                              add_metadata=True, golden_age=golden_age)
 
 
-    return 'Loop complete'
+    return 'Tweet on, son! Tweet on!'
 
 
 if __name__ == '__main__':
