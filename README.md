@@ -8,7 +8,7 @@
 
 This repository hosts code for a Twitter bot ([@SimpsonsHaiku](https://twitter.com/SimpsonsHaiku)) that tweets haikus mined from episodes of The Simpsons. 
 
-This project was inspired by [@nythaikus](https://twitter.com/nythaikus). The dataset used here is hosted [on Kaggle here](https://www.kaggle.com/datasets/prashant111/the-simpsons-dataset), and was originally scraped by [Todd Schneider](https://toddwschneider.com/posts/the-simpsons-by-the-data/) from the dearly departed simpsonsworld.com, covering the first 26 seasons. 
+This project was inspired by [@nythaikus](https://twitter.com/nythaikus). The dataset used here is hosted [on Kaggle here](https://www.kaggle.com/datasets/prashant111/the-simpsons-dataset), and was originally scraped by [Todd Schneider](https://toddwschneider.com/posts/the-simpsons-by-the-data/) from the dearly departed simpsonsworld.com, covering the first 26 seasons. Usage and some exploratory data analysis can be found at [haiku_demo.ipynb](https://github.com/mwestt/simpsons-haiku/blob/main/haiku_demo.ipynb)
 
 ## Installation
 
