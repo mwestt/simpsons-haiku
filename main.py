@@ -1,6 +1,6 @@
 import os
 import json
-import logging
+import nltk
 import numpy as np
 from datetime import datetime
 
@@ -13,7 +13,6 @@ def main(request):
         # Local version
         auth_dict=json.load(open('auth.json'))
     except:
-        logging.info('Trying to access environment variables')
         # GCP version
         auth_dict = {
             'api_key': os.environ.get("CONSUMER_KEY"),
@@ -21,6 +20,8 @@ def main(request):
             'access_token': os.environ.get("ACCESS_TOKEN"),
             'access_token_secret': os.environ.get("ACCESS_TOKEN_SECRET")
         }
+
+    nltk.download('cmudict')
 
     simpsons_bot = SimpsonsTwitterBot(
         auth_dict=auth_dict,
