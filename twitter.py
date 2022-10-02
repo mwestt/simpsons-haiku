@@ -1,6 +1,7 @@
 import os
 import json
 import tweepy
+import tempfile
 import compuglobal
 import requests
 import numpy as np
@@ -77,7 +78,8 @@ class SimpsonsTwitterBot():
             elif media_type == 'mp4':
                 media = requests.get(mp4_url).content
 
-            media_filename = 'media/media.{}'.format(media_type)
+            tmpdir = tempfile.gettempdir()
+            media_filename = '{}/media.{}'.format(tmpdir, media_type)
             with open(media_filename, 'wb') as handler:
                 handler.write(media)
 
