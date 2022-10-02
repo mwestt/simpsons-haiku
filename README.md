@@ -12,7 +12,7 @@ This project was inspired by [@nythaikus](https://twitter.com/nythaikus). The da
 
 ## Installation
 
-To run the project and generate your own haikus, you'll need to clone the repository in the usual way, and install the relevant packages/activate the conda environment shared in `environment.yaml`.
+To run the project and generate your own haikus, you'll need to clone the repository in the usual way, and install the relevant packages/activate the conda environment shared in `environment.yaml`. Direct dependences are also specified in the `requirements.txt` file. 
 
 ```
 git clone https://github.com/mwestt/simpsons-haiku.git
@@ -22,8 +22,7 @@ conda activate simpsons_haiku
 
 ## Example Usage
 
-We start by instantiating the core haiku object, of class `SimpsonsHaiku` from `haiku.py` and extracting a DataFrame of haikus. We can then call the `generate_haiku` method to sample a haiku along with associated metadata.
-
+We start by instantiating the core haiku object, of class `SimpsonsHaiku` from `haiku.py` and extracting a DataFrame of haikus. We can then call the `generate_haiku` method to sample a haiku along with associated metadata. 
 ```python
 from haiku import SimpsonsHaiku
 
