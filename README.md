@@ -26,8 +26,8 @@ We start by instantiating the core haiku object, of class `SimpsonsHaiku` from `
 ```python
 from haiku import SimpsonsHaiku
 
-simpsons_haiku = SimpsonsHaiku()  # Saves haiku DataFrame to `haiku_df.csv` by default
-simpsons_haiku.generate_haiku_df()
+simpsons_haiku = SimpsonsHaiku()  
+simpsons_haiku.generate_haiku_df()  # Saves haiku DataFrame to `haiku_df.csv` by default
 
 haiku, metadata = simpsons_haiku.generate_haiku()
 ```
