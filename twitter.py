@@ -105,7 +105,7 @@ class SimpsonsTwitterBot():
                                                    result.timestamp)
                 image_url = screencap.get_image_url()
                 meme_url = screencap.get_meme_url(caption)
-                gif_url = screencap.get_gif_url()
+                gif_url = screencap.get_gif_url(caption='')
                 mp4_url = screencap.get_mp4_url()
                 break
         
@@ -139,5 +139,5 @@ if __name__ == '__main__':
     golden_age = True if day == 2 else False
 
     # Tweet on, son, tweet on!
-    simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
+    simpsons_bot.tweet_haiku(media_reply=True, media_type='gif', 
                              add_metadata=True, golden_age=golden_age)

@@ -75,7 +75,7 @@ class SimpsonsHaiku():
                        'A. C.', 'A.C.', 'P.C.', 'C.P.R.', 'N.C.', 'L.P.', 'U.C.A.A.', 'S.B.C.', 'B.P.', 'U.P.K.C.C.', 'S.E.C.',
                        'R.O.T.C.', 'D.C.', 'C.J.', 'O.C.', 'M.C.', 'B.O.C.', 'C.O.D.', 'B.C.', 'C. M', 'U.S.A.', 'S.A.T.',
                        'A.D.D.', 'P.E.T.A.', 'A.M.', 'D.N.A.', 'A.A.', 'I.D.', 'P.T.A.', 'X.Y.Z.', 'X.R.L.', 'G.I', 'G.P.S.',
-                       'G.O.P.', 'D.M.V.', 'A.D.', 'D.U.I.', '']
+                       'G.O.P.', 'D.M.V.', 'A.D.', 'D.U.I.', 'U.S.']
 
         script_lines['spoken_words_split'] = script_lines['spoken_words']
         for char in replace_list:
@@ -256,7 +256,6 @@ class SimpsonsHaiku():
             
             haiku_list[i] += word + ' '
         
-        # haiku_list = [line.strip() for line in haiku_list]
         haiku_list = [re.sub(' +', ' ', line).strip() for line in haiku_list]
 
         if return_list:    
