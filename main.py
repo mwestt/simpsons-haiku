@@ -39,7 +39,6 @@ def main(request):
     simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
                              add_metadata=True, golden_age=golden_age)
 
-
     return 'Tweet on, son! Tweet on!'
 
 

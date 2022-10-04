@@ -88,7 +88,7 @@ class SimpsonsHaiku():
         script_lines['number_in_line'] = script_lines['spoken_words_split'].apply(lambda x: [i for i in range(1, len(x)+1)])
         script_lines = script_lines.explode(['spoken_words_split', 'number_in_line'])
 
-        # Order by episode then line sequence
+        # Order by episode then line sequence, add syllable count
         script_lines = script_lines.sort_values(['episode_id', 'number', 'number_in_line'])
 
         script_lines['n_syllables'] = script_lines.spoken_words_split.progress_apply(self.count_syllables_line)
@@ -100,7 +100,7 @@ class SimpsonsHaiku():
     def num_syllables(self, word):
         """Number of syllables using NLTK. Props to user hoju (!) at `https://stackoverflow.com/a/4103234`."""
         
-        # TODO Add step to cast numeric characters as to words
+        # TODO Add step to cast numeric characters to words
 
         for char in self.strip_list:
             word = word.replace(char, '')
