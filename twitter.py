@@ -83,7 +83,11 @@ class SimpsonsTwitterBot():
             with open(media_filename, 'wb') as handler:
                 handler.write(media)
 
-            media_id = self.api.chunked_upload(media_filename).media_id
+            if media_type == 'gif':
+                media_id = self.api.chunked_upload(media_filename, media_category='tweet_gif').media_id
+            else:
+                media_id = self.api.media_upload(media_filename).media_id
+                
             self.api.update_status(q, media_ids=[media_id], in_reply_to_status_id=tweet_id)
 
             print('Media reply tweeted')
@@ -140,5 +144,5 @@ if __name__ == '__main__':
     golden_age = True if day == 2 else False
 
     # Tweet on, son, tweet on!
-    simpsons_bot.tweet_haiku(media_reply=True, media_type='jpg', 
+    simpsons_bot.tweet_haiku(media_reply=True, media_type=media_type, 
                              add_metadata=True, golden_age=golden_age)

@@ -43,4 +43,5 @@ def main(request):
 
 
 if __name__ == '__main__':
-    main()
+    request = None
+    main(request)
