@@ -86,7 +86,7 @@ class SimpsonsTwitterBot():
             if media_type == 'gif':
                 media_id = self.api.chunked_upload(media_filename, media_category='tweet_gif').media_id
             else:
-                media_id = self.api.media_upload(media_filename).media_id
+                media_id = self.api.chunked_upload(media_filename, media_category='tweet_image').media_id
                 
             self.api.update_status(q, media_ids=[media_id], in_reply_to_status_id=tweet_id)
 
