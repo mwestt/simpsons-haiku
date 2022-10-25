@@ -12,7 +12,7 @@ This project was inspired by [@nythaikus](https://twitter.com/nythaikus). The da
 
 ## Installation
 
-To run the project and generate your own haikus, you'll need to clone the repository in the usual way, and install the relevant packages/activate the conda environment shared in `environment.yaml`. Direct dependences are also specified in the `requirements.txt` file. 
+To run the project and generate your own haiku, you'll need to clone the repository in the usual way, and install the relevant packages/activate the conda environment shared in `environment.yaml`. Direct dependences are also specified in the `requirements.txt` file. 
 
 ```
 git clone https://github.com/mwestt/simpsons-haiku.git
