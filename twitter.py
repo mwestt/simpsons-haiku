@@ -12,24 +12,38 @@ from haiku import SimpsonsHaiku
 class SimpsonsTwitterBot():
 
 
-    def __init__(self, auth_dict=None, haiku_df=None):
+    def __init__(self, auth_dict=None, haiku_df=None, api_version='v2'):
         self.auth_dict = auth_dict
         self.API_KEY = self.auth_dict['api_key']
         self.API_SECRET = self.auth_dict['api_key_secret']
         self.ACCESS_TOKEN = self.auth_dict['access_token']
         self.ACCESS_SECRET = self.auth_dict['access_token_secret']
-        self.api = self.authenticate()
+        self.BEARER_TOKEN = self.auth_dict['bearer_token']
+
+        self.api_version = api_version
+        self.api, self.client = self.authenticate(version=self.api_version)
         self.haiku_df = haiku_df
 
 
-    def authenticate(self):
-        """Authenticate using OAuth1."""
+    def authenticate(self, version='v2'):
+        """Authenticate using OAuth 1.0a User Context, for Twitter API v1 or v2."""
+        
+        # v1 API needed for media upload even if using v2 API (on free tier)
         auth = tweepy.OAuth1UserHandler(
             self.API_KEY, self.API_SECRET, self.ACCESS_TOKEN, self.ACCESS_SECRET
         )
         api = tweepy.API(auth)
-
-        return api
+        
+        client = None
+        if version == 'v2':
+            client = tweepy.Client(
+                consumer_key=self.API_KEY,
+                consumer_secret=self.API_SECRET,
+                access_token=self.ACCESS_TOKEN,
+                access_token_secret=self.ACCESS_SECRET
+            )
+        
+        return api, client
 
 
     def tweet_haiku(self, media_reply=True, media_type='jpg', add_metadata=True,
@@ -38,8 +52,13 @@ class SimpsonsTwitterBot():
         simpsons_haiku = SimpsonsHaiku(self.haiku_df)
         haiku, metadata = simpsons_haiku.generate_haiku(golden_age=golden_age)
 
-        tweet = self.api.update_status(haiku)
-        tweet_id = tweet._json['id']
+        if self.api_version == 'v1':
+            tweet = self.api.update_status(haiku)
+            tweet_id = tweet._json['id']
+        else:
+            tweet = self.client.create_tweet(text=haiku)
+            tweet_id = tweet.data['id']
+
         print('Haiku tweeted')
         
         if media_reply:
@@ -65,8 +84,12 @@ class SimpsonsTwitterBot():
                 image_url, meme_url, gif_url, mp4_url = self.search_frinkiac(haiku_start, episode_key)
 
             if image_url is None and meme_url is None and gif_url is None and mp4_url is None:
-                self.api.update_status(q, in_reply_to_status_id=tweet_id)
-                return "No Frinkiac result found."
+                if self.api_version == 'v1':
+                    self.api.update_status(q, in_reply_to_status_id=tweet_id)
+                else:
+                    self.client.create_tweet(text=q, in_reply_to_tweet_id=tweet_id)
+                print("No Frinkiac result found.")
+                return None
 
             if media_type == 'jpg':
                 if caption:
@@ -88,7 +111,10 @@ class SimpsonsTwitterBot():
             else:
                 media_id = self.api.chunked_upload(media_filename, media_category='tweet_image').media_id
                 
-            self.api.update_status(q, media_ids=[media_id], in_reply_to_status_id=tweet_id)
+            if self.api_version == 'v1':
+                self.api.update_status(q, media_ids=[media_id], in_reply_to_status_id=tweet_id)
+            else:
+                self.client.create_tweet(text=q, media_ids=[media_id], in_reply_to_tweet_id=tweet_id)
 
             print('Media reply tweeted')
 

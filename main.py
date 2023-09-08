@@ -45,3 +45,30 @@ def main(request):
 if __name__ == '__main__':
     request = None
     main(request)
+
+# import tweepy
+# import json
+
+# auth_dict=json.load(open('auth.json'))
+
+# oauth2_user_handler = tweepy.OAuth2UserHandler(
+#     client_id=auth_dict['client_id'],
+#     redirect_uri="https://simpsonshaiku.com",
+#     scope=["tweet.read", "tweet.write"],
+#     # Client Secret is only necessary if using a confidential client
+#     client_secret=auth_dict["client_secret"],
+# )
+
+# # oauth2_user_handler._client.code_verifier = "6sklXi1DTghv4eDyOp4coRIlF5md9a_dUhSvqLabocrqMe5VI93uAE4KwRN6WFxEIE0jLuCVY9YnZt_hP5N4UQ"
+# # oauth2_user_handler._client.code_challenge = "yfCkb0Bn7hJAz50OGXE-H50AXeO8pX38nnRU9jDdHgU"
+
+# # print(dir(oauth2_user_handler._client))
+# # response_url = oauth2_user_handler.get_authorization_url()
+# # print(response_url)
+
+# access_token = oauth2_user_handler.fetch_token(
+#     "https://simpsonshaiku.com/?state=AwSqAEAsQJk9PMNkMvz8C11RXyWGAV&code=dFB2d2VjRVJaVktWNjlyTDNJZkl5NjY3Yk1yUGM4TTB0TlFBemxGN3J6bHo1OjE2OTQxMjkwNDE5MTQ6MToxOmFjOjE"
+# )
+
+# client = tweepy.Client(access_token['access_token'])
+# client.create_tweet('v2 API test')
