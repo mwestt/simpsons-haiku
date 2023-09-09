@@ -18,7 +18,6 @@ class SimpsonsTwitterBot():
         self.API_SECRET = self.auth_dict['api_key_secret']
         self.ACCESS_TOKEN = self.auth_dict['access_token']
         self.ACCESS_SECRET = self.auth_dict['access_token_secret']
-        self.BEARER_TOKEN = self.auth_dict['bearer_token']
 
         self.api_version = api_version
         self.api, self.client = self.authenticate(version=self.api_version)
